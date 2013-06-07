@@ -1,3 +1,6 @@
+/* Recieving characters from arduino through serial pin ,and convert it to IP_PACKET including AT*COMMAND of AR.DRone . 
+    This code will work on AR.Drone .
+ */
 #include <unistd.h> //for open() close() read() 
 #include <fcntl.h>
 #include <termios.h>
@@ -10,13 +13,13 @@
 #include <netinet/in.h>
 
 #define BAUDRATE B9600
-#define MODEMDEVICE "/dev/ttyPA0"
+#define MODEMDEVICE "/dev/ttyPA0" /* AR.Drone Serial Port */
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
 #define TRUE 1
 
-#define PORT 5556
-#define ADDR "192.168.1.1"
+#define PORT 5556 /*AR.Drone COMMAND PORT*/
+#define ADDR "192.168.1.1" /*AR.Drone IP address*/
 
 void makeATCommand(char *at_command,int seq,char serialRead);
 void interrupt(int sig);
@@ -41,7 +44,7 @@ int  main() {
 	if(serialOpen() != 0) return -1;
 	signal(SIGINT, interrupt); //set ctrl-c handler
 
-	/* socket */
+	/* Prepare Socket */
 	sock_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	receiver_addr.sin_family = AF_INET;
 	if( inet_aton( ADDR,  &receiver_addr.sin_addr )== 0) {
