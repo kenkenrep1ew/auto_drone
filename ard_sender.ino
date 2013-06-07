@@ -1,6 +1,4 @@
 #include <SoftwareSerial.h>
-
-
 #include <ctype.h>
 
 SoftwareSerial gps(2,3);
@@ -11,7 +9,7 @@ char c;
 void setup () {
   int i;
   pinMode(led, OUTPUT);
-  Serial.begin(57600);
+  Serial.begin(9600);
   gps.begin(9600);
   gps.flush();
   
@@ -21,8 +19,7 @@ void loop () {
   int i;
   static char s[256];
   static int pos = 0;
-  //float dist_lat = 34.6857888,  dist_lon = 135.6914388;
-  float dist_lat = 34.7334333, dist_lon = 135.7344833;
+  float dist_lat = 34.7334333, dist_lon = 135.7344833;//Here is the center of NAIST Ground
   
   if (gps.available()) {
       s[pos] = gps.read();
@@ -42,13 +39,6 @@ void loop () {
   }
 }
 
-void reach(){
-  if (Serial.available() > 0){
-      Serial.read();
-      hover();
-  }
-}
-
 // analyze GPS output.
 int analyze_data(char *s) {
   char *type;
@@ -56,6 +46,7 @@ int analyze_data(char *s) {
   char *latitude, *longitude;
   char *tmp;
   
+  //parse GPS data.
   type = strtok(s, ",");
   if(strcmp(s, "$GPRMC") != 0) {
     return 0;
@@ -66,17 +57,7 @@ int analyze_data(char *s) {
   latitude = strtok(NULL, ",");
   tmp = strtok(NULL, ",");
   longitude = strtok(NULL, ",");
-/*  if (digitalRead(CTS) == LOW){
-    Serial.println(time);
-    Serial.println(latitude);
-    Serial.println(longitude);
-    Serial.println();
-  
-    Serial.print(stod(latitude), 7);
-    Serial.print(", ");
-    Serial.println(stod(longitude), 7);
-    Serial.println();
-  }*/
+
   g_lat = stod(latitude);
   g_lon = stod(longitude);
   return 1;
@@ -95,6 +76,7 @@ float stod(char *s) {
   return deg + min / 60;
 }
 
+//Send a character to AR.Drone. This is converted to AT*COMMAND by AR.Drone (auto_drone) .
 void move_left(){
 Serial.print('a');
 delay(200);
